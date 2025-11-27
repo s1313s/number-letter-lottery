@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>随机分配 + 北京时间</title>
+    <style>
+        body {
+            font-family: Arial, "Microsoft YaHei", sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        /* 北京时间样式 */
+        .time-container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .time-container h2 {
+            margin: 0 0 10px 0;
+            color: #333;
+        }
+        
+        #time {
+            font-size: 32px;
+            color: #667eea;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+        }
+        
+        #date {
+            font-size: 18px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        /* 随机分配样式 */
+        .assign-container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .assign-container h2 {
+            text-align: center;
+            color: #333;
+            margin-top: 0;
+        }
+        
+        .input-section {
+            margin-bottom: 20px;
+        }
+        
+        .input-section label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: bold;
+        }
+        
+        .input-section input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        
+        .input-section input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .hint {
+            font-size: 12px;
+            color: #888;
+            margin-top: 5px;
+        }
+        
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .result-container {
+            margin-top: 30px;
+            display: none;
+        }
+        
+        .result-item {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: slideIn 0.5s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .result-item .person {
+            font-weight: bold;
+            color: #333;
+            font-size: 18px;
+        }
+        
+        .result-item .item {
+            font-size: 24px;
+            color: #667eea;
+            font-weight: bold;
+        }
+        
+        .arrow {
+            color: #999;
+            margin: 0 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 北京时间 -->
+        <div class="time-container">
+            <h2>🕐 北京时间</h2>
+            <div id="time"></div>
+            <div id="date"></div>
+        </div>
+        
+        <!-- 随机分配 -->
+        <div class="assign-container">
+            <h2>🎲 随机分配工具</h2>
+            
+            <div class="input-section">
+                <label for="people">输入人员名单：</label>
+                <input type="text" id="people" placeholder="例如：张三,李四,王五" value="人1,人2,人3">
+                <div class="hint">多个人员用逗号分隔</div>
+            </div>
+            
+            <div class="input-section">
+                <label for="items">输入物品名单：</label>
+                <input type="text" id="items" placeholder="例如：A,B,C" value="A,B,C">
+                <div class="hint">多个物品用逗号分隔</div>
+            </div>
+            
+            <button onclick="randomAssign()">🎯 开始随机分配</button>
+            
+            <div class="result-container" id="resultContainer">
+                <h3 style="text-align: center; color: #333;">分配结果：</h3>
+                <div id="result"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 北京时间更新
+        function updateTime() {
+            const now = new Date();
+            const beijingTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Shanghai' }));
+            
+            const hours = String(beijingTime.getHours()).padStart(2, '0');
+            const minutes = String(beijingTime.getMinutes()).padStart(2, '0');
+            const seconds = String(beijingTime.getSeconds()).padStart(2, '0');
+            
+            const year = beijingTime.getFullYear();
+            const month = String(beijingTime.getMonth() + 1).padStart(2, '0');
+            const day = String(beijingTime.getDate()).padStart(2, '0');
+            
+            const weekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+            const weekday = weekdays[beijingTime.getDay()];
+            
+            document.getElementById('time').textContent = `${hours}:${minutes}:${seconds}`;
+            document.getElementById('date').textContent = `${year}年${month}月${day}日 ${weekday}`;
+        }
+        
+        updateTime();
+        setInterval(updateTime, 1000);
+        
+        // 随机分配功能
+        function randomAssign() {
+            // 获取输入
+            const peopleInput = document.getElementById('people').value.trim();
+            const itemsInput = document.getElementById('items').value.trim();
+            
+            if (!peopleInput || !itemsInput) {
+                alert('请输入人员和物品名单！');
+                return;
+            }
+            
+            // 分割并去除空格
+            const people = peopleInput.split(',').map(p => p.trim()).filter(p => p);
+            const items = itemsInput.split(',').map(i => i.trim()).filter(i => i);
+            
+            if (people.length === 0 || items.length === 0) {
+                alert('人员或物品名单不能为空！');
+                return;
+            }
+            
+            if (people.length !== items.length) {
+                alert(`人员数量(${people.length})和物品数量(${items.length})不匹配！`);
+                return;
+            }
+            
+            // 随机打乱物品
+            const shuffledItems = [...items].sort(() => Math.random() - 0.5);
+            
+            // 生成结果
+            const resultContainer = document.getElementById('resultContainer');
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '';
+            
+            people.forEach((person, index) => {
+                const resultItem = document.createElement('div');
+                resultItem.className = 'result-item';
+                resultItem.style.animationDelay = `${index * 0.1}s`;
+                resultItem.innerHTML = `
+                    <span class="person">${person}</span>
+                    <span class="arrow">➜</span>
+                    <span class="item">${shuffledItems[index]}</span>
+                `;
+                resultDiv.appendChild(resultItem);
+            });
+            
+            resultContainer.style.display = 'block';
+        }
+        
+        // 回车键触发分配
+        document.getElementById('people').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') randomAssign();
+        });
+        
+        document.getElementById('items').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') randomAssign();
+        });
+    </script>
+</body>
+</html>
