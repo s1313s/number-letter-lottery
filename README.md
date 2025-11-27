@@ -14,7 +14,7 @@
 
 ### 在线使用
 
-直接访问：[点击这里使用](https://s1313s.github.io/number-letter-lottery/)
+直接访问：[点击这里使用](https://s1313s.github.io/number-letter-lottery/1.html)
 
 ### 本地使用
 
