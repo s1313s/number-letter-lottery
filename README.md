@@ -14,7 +14,7 @@
 
 ### 在线使用
 
-直接访问：[点击这里使用](https://github.com/s1313s/number-letter-lottery/blob/main/1.html)
+直接访问：[点击这里使用](https://github.com/s1313s/number-letter-lottery/)
 
 ### 本地使用
 
@@ -72,7 +72,7 @@ MIT License
 
 ## 👨‍💻 作者
 
-[@你的GitHub用户名](https://github.com/s1313s)
+[@s1313s](https://github.com/s1313s)
 
 ---
 
